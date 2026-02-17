@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<mujoco model="Frank">
+
+    <include file="scene/myosuite_scene_noPedestal.xml" />
+    <compiler angle="radian" meshdir="." texturedir=".." />
+
+    <worldbody>
+        <body name="root" pos="-.025 0.1 1">
+            <freejoint name='root' />
+        </body>
+    </worldbody>
+
+</mujoco>

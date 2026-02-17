@@ -17,7 +17,6 @@ def mirror(spec):
 
         body.pos *= [1, 1, -1]
 
-        # Mirror orientation across the Z-plane
         if body.alt.type == mujoco.mjtOrientation.mjORIENTATION_EULER:
             # For xyz eulerseq: M @ Rx(ex)Ry(ey)Rz(ez) @ M = Rx(-ex)Ry(-ey)Rz(ez)
             body.alt.euler *= [-1, -1, 1]
@@ -56,33 +55,31 @@ def mirror(spec):
 
 
 if __name__ == "__main__":
+    full_body_spec = mujoco.MjSpec.from_file("base.xml")
 
-    body = mujoco.MjSpec.from_file("torso/myotorso.xml")
-    r_arm = mujoco.MjSpec.from_file("arm/myoarm.xml")
-    l_arm = mirror(mujoco.MjSpec.from_file("arm/myoarm.xml"))
-    head = mujoco.MjSpec.from_file("head/myohead.xml")
-    legs = mujoco.MjSpec.from_file("leg/myolegs.xml")
+    torso_spec = mujoco.MjSpec.from_file("torso/myotorso.xml")
+    arm_spec = mujoco.MjSpec.from_file("arm/myoarm.xml")
+    left_arm_spec = mirror(mujoco.MjSpec.from_file("arm/myoarm.xml"))
+    head_spec = mujoco.MjSpec.from_file("head/myohead.xml")
+    legs_spec = mujoco.MjSpec.from_file("leg/myolegs.xml")
 
-    torso = body.body("torso")
+    root_body = full_body_spec.body("root")
 
-    l_attach_site = torso.add_site(name="arm_l_attach")
-    body.attach(l_arm, suffix="_arm_l", site=l_attach_site)
+    root_attach_site = root_body.add_site(name="torso_attach")
+    full_body_spec.attach(torso_spec, suffix="_torso", site=root_attach_site)
+    full_body_spec.attach(legs_spec, suffix="_leg", site=root_attach_site)
 
-    r_attach_site = torso.add_site(name="arm_r_attach")
-    body.attach(r_arm, suffix="_arm_r", site=r_attach_site)
+    torso_body = full_body_spec.body("/torso_torso")
 
-    head_attach_site = torso.add_site(name="head_attach")
-    body.attach(head, suffix="_head", site=head_attach_site)
+    torso_attach_site = torso_body.add_site(name="arm_l_attach")
+    full_body_spec.attach(left_arm_spec, suffix="_arm_l", site=torso_attach_site)
+    full_body_spec.attach(arm_spec, suffix="_arm_r", site=torso_attach_site)
+    full_body_spec.attach(head_spec, suffix="_head", site=torso_attach_site)
 
-    sacrum = body.body("Full Body")
-
-    leg_attach_site = sacrum.add_site(name="leg_attach")
-    body.attach(legs, suffix="_leg", site=leg_attach_site)
-
-    model = body.compile()
+    model = full_body_spec.compile()
     data = mujoco.MjData(model)
 
-    body.to_file("frank.xml")
+    full_body_spec.to_file("frank.xml")
 
     with mujoco.viewer.launch_passive(model, data) as viewer:
         while viewer.is_running():
