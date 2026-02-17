@@ -1,7 +1,7 @@
 <mujoco>
-      <compiler angle="radian" meshdir=".." texturedir=".."/>
-      <include file="assets/myoarm_assets.xml"/>
-      <worldbody>
-        <include file="assets/myoarm_body.xml"/>
-      </worldbody>
-    </mujoco>
+    <compiler angle="radian" meshdir=".." texturedir=".." />
+    <include file="assets/myoarm_assets.xml" />
+    <worldbody>
+        <include file="assets/myoarm_chain.xml" />
+    </worldbody>
+</mujoco>

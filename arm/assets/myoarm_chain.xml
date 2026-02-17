@@ -1,15 +1,16 @@
 ﻿<mujocoinclude model="MyoArm_v0.01">
-<!-- =================================================
+    <!-- =================================================
     Copyright 2025 Vikash Kumar, Vittorio Caggiano,
     Model	:: MyoArm (MuJoCoV3.2.4)
     Author	:: Vikash Kumar (vikashplus@gmail.com), Vittorio Caggiano
     source	:: https://github.com/vikashplus
-    License	:: Under Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+    License	:: Under Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 ====================================================== -->
 
     <body name="thorax" pos="0.0040000 0.3638051 0.0249033" childclass="arm" euler="-0.0002043 0 0.0007963">
         <inertial diaginertia="0.0764928 0.0573742 0.0471" mass="8.09341" pos="-0.02118 -0.128888 -9.98087e-05" quat="0.988645 -0.00439528 0.000169877 0.150204" />
-        <!-- <geom mesh="ground_geom_1_thorax" name="ground_geom_1" type="mesh"/> -->
         <body euler="-1.57 0 0" pos=".1 -.455 -.02">
             <geom name="thorax_coll0" type="capsule" class="myoarm_coll" size="0.080 0.077" pos="-.065 0 .070" euler="1.57 0 0" />
             <geom name="thorax_coll1" type="ellipsoid" class="myoarm_coll" size="0.095 0.140 0.140" pos="-.075 0 .200" euler="1.57 0 0" />
