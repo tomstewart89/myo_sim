@@ -6,7 +6,7 @@ from pathlib import Path
 import numpy as np
 
 
-def mirror(spec, meshdir):
+def mirror(spec):
     """Mirror a tree of bodies across the Z-plane in-place."""
     mirrored_meshes = set()
     queue = list(spec.worldbody.bodies)
@@ -17,9 +17,14 @@ def mirror(spec, meshdir):
 
         body.pos *= [1, 1, -1]
 
-        T = np.diag([1.0, 1.0, -1.0, 1.0])
-        R = quaternion_matrix(body.quat)
-        body.quat[:] = quaternion_from_matrix(T @ R @ T)
+        # Mirror orientation across the Z-plane
+        if body.alt.type == mujoco.mjtOrientation.mjORIENTATION_EULER:
+            # For xyz eulerseq: M @ Rx(ex)Ry(ey)Rz(ez) @ M = Rx(-ex)Ry(-ey)Rz(ez)
+            body.alt.euler *= [-1, -1, 1]
+        else:
+            T = np.diag([1.0, 1.0, -1.0, 1.0])
+            R = quaternion_matrix(body.quat)
+            body.quat[:] = quaternion_from_matrix(T @ R @ T)
 
         for joint in body.joints:
             joint.axis *= [1, 1, -1]
@@ -33,7 +38,7 @@ def mirror(spec, meshdir):
 
             if geom.meshname and geom.meshname not in mirrored_meshes:
                 mesh = next(m for m in spec.meshes if m.name == geom.meshname)
-                mesh_file = (meshdir / mesh.file).resolve()
+                mesh_file = (Path(__file__).parent / mesh.file).resolve()
                 mirrored_file = mesh_file.parent / (
                     mesh_file.stem + "_mirrored" + mesh_file.suffix
                 )
@@ -44,40 +49,37 @@ def mirror(spec, meshdir):
                 )
                 stl.export(mirrored_file)
 
-                mesh.file = str(mirrored_file.relative_to(meshdir))
+                mesh.file = str(mirrored_file.relative_to(Path(__file__).parent))
                 mirrored_meshes.add(geom.meshname)
+
+    return spec
 
 
 if __name__ == "__main__":
-    model_path = Path("torso/myotorso.xml")
-    meshdir = (model_path.parent / "..").resolve()
 
-    spec = mujoco.MjSpec.from_file(str(model_path))
-
-    l_arm_spec = mujoco.MjSpec.from_file("arm/myoarm.xml")
-    r_arm_spec = mujoco.MjSpec.from_file("arm/myoarm.xml")
+    body = mujoco.MjSpec.from_file("torso/myotorso.xml")
+    l_arm = mirror(mujoco.MjSpec.from_file("arm/myoarm.xml"))
+    r_arm = mujoco.MjSpec.from_file("arm/myoarm.xml")
     head = mujoco.MjSpec.from_file("head/myohead.xml")
     legs = mujoco.MjSpec.from_file("leg/myolegs.xml")
 
-    mirror(l_arm_spec, meshdir)
-
-    torso = spec.body("torso")
+    torso = body.body("torso")
 
     l_attach_site = torso.add_site(name="arm_l_attach")
-    spec.attach(l_arm_spec, suffix="_l", site=l_attach_site)
+    body.attach(l_arm, suffix="_l", site=l_attach_site)
 
     r_attach_site = torso.add_site(name="arm_r_attach")
-    spec.attach(r_arm_spec, suffix="_r", site=r_attach_site)
+    body.attach(r_arm, suffix="_r", site=r_attach_site)
 
     head_attach_site = torso.add_site(name="head_attach")
-    spec.attach(head, site=head_attach_site)
+    body.attach(head, site=head_attach_site)
 
-    body = spec.body("Full Body")
+    sacrum = body.body("Full Body")
 
-    leg_attach_site = body.add_site(name="leg_attach")
-    spec.attach(legs, site=leg_attach_site)
+    leg_attach_site = sacrum.add_site(name="leg_attach")
+    body.attach(legs, site=leg_attach_site)
 
-    model = spec.compile()
+    model = body.compile()
     data = mujoco.MjData(model)
 
     with mujoco.viewer.launch_passive(model, data) as viewer:
