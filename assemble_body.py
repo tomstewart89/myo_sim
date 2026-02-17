@@ -65,13 +65,13 @@ if __name__ == "__main__":
 
     root_body = full_body_spec.body("root")
 
-    root_attach_site = root_body.add_site(name="torso_attach")
+    root_attach_site = root_body.add_site(name="root_attach")
     full_body_spec.attach(torso_spec, suffix="_torso", site=root_attach_site)
     full_body_spec.attach(legs_spec, suffix="_leg", site=root_attach_site)
 
     torso_body = full_body_spec.body("/torso_torso")
 
-    torso_attach_site = torso_body.add_site(name="arm_l_attach")
+    torso_attach_site = torso_body.add_site(name="torso_attach")
     full_body_spec.attach(left_arm_spec, suffix="_arm_l", site=torso_attach_site)
     full_body_spec.attach(arm_spec, suffix="_arm_r", site=torso_attach_site)
     full_body_spec.attach(head_spec, suffix="_head", site=torso_attach_site)
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     model = full_body_spec.compile()
     data = mujoco.MjData(model)
 
-    full_body_spec.to_file("frank.xml")
+    full_body_spec.to_file("fullbody.xml")
 
     with mujoco.viewer.launch_passive(model, data) as viewer:
         while viewer.is_running():

@@ -1,10 +1,18 @@
 <?xml version="1.0"?>
-<mujoco model="Frank">
+<mujoco model="FullBody">
 
-    <include file="scene/myosuite_scene_noPedestal.xml" />
     <compiler angle="radian" meshdir="." texturedir=".." />
 
+    <asset>
+        <texture name="sky" type="skybox" builtin="gradient" rgb1=".5 .7 .9" rgb2=".15 .3 .5" width="256" height="256" />
+        <texture name="checker" type="2d" builtin="checker" rgb1=".9 .9 .9" rgb2=".7 .7 .7" width="256" height="256" />
+        <material name="floor_mat" texture="checker" texrepeat="4 4" texuniform="true" reflectance="0.1" />
+    </asset>
+
     <worldbody>
+        <light directional="false" diffuse=".6 .6 .6" specular="0.3 0.3 0.3" pos="0 -3 3" dir="0 1 -1" mode="trackcom" />
+        <geom name="floor" pos="0 0 0" size="7 7 .1" conaffinity="1" contype="1" type="plane" condim="3" material="floor_mat" />
+
         <body name="root" pos="-.025 0.1 1">
             <freejoint name='root' />
         </body>
