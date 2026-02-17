@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     l_arm_spec = mujoco.MjSpec.from_file("arm/myoarm.xml")
     r_arm_spec = mujoco.MjSpec.from_file("arm/myoarm.xml")
-    head = mujoco.MjSpec.from_file("head/myohead_simple.xml")
+    head = mujoco.MjSpec.from_file("head/myohead.xml")
     legs = mujoco.MjSpec.from_file("leg/myolegs.xml")
 
     mirror(l_arm_spec, meshdir)
