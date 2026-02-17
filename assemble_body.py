@@ -58,29 +58,31 @@ def mirror(spec):
 if __name__ == "__main__":
 
     body = mujoco.MjSpec.from_file("torso/myotorso.xml")
-    l_arm = mirror(mujoco.MjSpec.from_file("arm/myoarm.xml"))
     r_arm = mujoco.MjSpec.from_file("arm/myoarm.xml")
+    l_arm = mirror(mujoco.MjSpec.from_file("arm/myoarm.xml"))
     head = mujoco.MjSpec.from_file("head/myohead.xml")
     legs = mujoco.MjSpec.from_file("leg/myolegs.xml")
 
     torso = body.body("torso")
 
     l_attach_site = torso.add_site(name="arm_l_attach")
-    body.attach(l_arm, suffix="_l", site=l_attach_site)
+    body.attach(l_arm, suffix="_arm_l", site=l_attach_site)
 
     r_attach_site = torso.add_site(name="arm_r_attach")
-    body.attach(r_arm, suffix="_r", site=r_attach_site)
+    body.attach(r_arm, suffix="_arm_r", site=r_attach_site)
 
     head_attach_site = torso.add_site(name="head_attach")
-    body.attach(head, site=head_attach_site)
+    body.attach(head, suffix="_head", site=head_attach_site)
 
     sacrum = body.body("Full Body")
 
     leg_attach_site = sacrum.add_site(name="leg_attach")
-    body.attach(legs, site=leg_attach_site)
+    body.attach(legs, suffix="_leg", site=leg_attach_site)
 
     model = body.compile()
     data = mujoco.MjData(model)
+
+    body.to_file("frank.xml")
 
     with mujoco.viewer.launch_passive(model, data) as viewer:
         while viewer.is_running():
